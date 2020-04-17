@@ -34,16 +34,23 @@ namespace CalculatorSample.Logic
 
 		public double Divide(double x, double y)
 		{
+			var z = x / y;
+			_logger.Log($"Operation Divide: x={x}, y={y}, result={z}");
+			return z;
+		}
+
+		public int DivideInt(int x, int y)
+		{
 			try
 			{
 				var z = x / y;
 				_logger.Log($"Operation Divide: x={x}, y={y}, result={z}");
 				return z;
 			}
-			catch(Exception ex)
+			catch (DivideByZeroException ex)
 			{
 				_logger.Log($"Operation Divide: x={x}, y={y}, result={ex.Message}");
-				throw new Exception(ex.Message);
+				throw new DivideByZeroException(ex.Message);
 			}
 		}
 

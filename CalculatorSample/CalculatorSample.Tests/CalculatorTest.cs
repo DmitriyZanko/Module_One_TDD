@@ -86,19 +86,17 @@ namespace CalculatorSample.Tests
 			CheckTest(4, actual, mock);
 		}
 
-
 		[Test]
 		public void Test_Divide_By_Zero()
 		{
-			var mock = InitMock();
-			try
-			{
-				var actual = new Calculator(mock.Object).Divide(1, 0);
-			}
-			catch (Exception ex)
-			{
-				Assert.IsNotNull(ex);
-			}
+			var actual = new Calculator(InitMock().Object).Divide(1, 0);
+			Assert.IsTrue(double.IsInfinity(actual));
+		}
+
+		[Test]
+		public void Test_DivideInt_By_Zero()
+		{
+			Assert.Throws<DivideByZeroException>(() => new Calculator(InitMock().Object).DivideInt(1, 0));
 		}
 
 		[Test]
@@ -116,6 +114,5 @@ namespace CalculatorSample.Tests
 			var actual = new Calculator(mock.Object).Pow(4, -2);
 			CheckTest(0.0625, actual, mock);
 		}
-
 	}
 }
