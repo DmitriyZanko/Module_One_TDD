@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CalculatorSample.Tests
@@ -19,6 +20,12 @@ namespace CalculatorSample.Tests
 		private void CheckTest(double expected, double actual, Mock<ILogger> mock)
 		{
 			mock.Verify(l => l.Log(It.IsAny<string>()), Times.Exactly(1));
+			Assert.AreEqual(expected, actual);
+		}
+
+		private void CheckTest(IEnumerable<int> expected, IEnumerable<int> actual, Mock<ILogger> mock, int countRecords = 1)
+		{
+			mock.Verify(l => l.Log(It.IsAny<string>()), Times.Exactly(countRecords));
 			Assert.AreEqual(expected, actual);
 		}
 
@@ -114,5 +121,66 @@ namespace CalculatorSample.Tests
 			var actual = new Calculator(mock.Object).Pow(4, -2);
 			CheckTest(0.0625, actual, mock);
 		}
+
+		[Test]
+		public void Test_SearchNumbers_Negative_SumDigits()
+		{
+			Assert.Throws<ArgumentException>(() => new Calculator(InitMock().Object).SearchNumbers(-1, 1));
+		}
+
+		[Test]
+		public void Test_SearchNumbers_Negative_CountDigits()
+		{
+			Assert.Throws<ArgumentException>(() => new Calculator(InitMock().Object).SearchNumbers(1, -1));
+		}
+		
+		[Test]
+		public void Test_SearchNumbers_Negative_SumAndCountDigits()
+		{
+			Assert.Throws<ArgumentException>(() => new Calculator(InitMock().Object).SearchNumbers(-1, -1));
+		}
+
+		[Test]
+		public void Test_SearchNumbers_Empty_Result()
+		{
+			var mock = InitMock();
+			var actual = new Calculator(mock.Object).SearchNumbers(10, 1);
+			CheckTest(new int[0], actual, mock);
+		}
+
+
+		[Test]
+		public void Test_SearchNumbers_Zero_SumAndCountDigits()
+		{
+			var mock = InitMock();
+			var actual = new Calculator(mock.Object).SearchNumbers(0, 0);
+			CheckTest(new[] { 1, 0, 0 }, actual, mock, 2);
+		}
+
+		[Test]
+		public void Test_SearchNumbers_Fist_Number()
+		{
+			var mock = InitMock();
+			var actual = new Calculator(mock.Object).SearchNumbers(1, 1);
+			CheckTest(new[] { 1, 1, 1 }, actual, mock, 2);
+		}
+
+		[Test]
+		public void Test_SearchNumbers_Last_Number()
+		{
+			var mock = InitMock();
+			var actual = new Calculator(mock.Object).SearchNumbers(9, 1);
+			CheckTest(new[] { 1, 9, 9 }, actual, mock, 2);
+		}
+
+		[Test]
+		public void Test_SearchNumbers_Any_Number()
+		{
+			var mock = InitMock();
+			var actual = new Calculator(mock.Object).SearchNumbers(5, 2);
+			CheckTest(new[] { 5, 14, 50 }, actual, mock, 2);
+		}
+
+
 	}
 }

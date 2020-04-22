@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CalculatorSample.Logic
 {
@@ -59,6 +61,39 @@ namespace CalculatorSample.Logic
 			var z = Math.Pow(x, y);
 			_logger.Log($"Operation Pow: x={x}, y={y}, result={z}");
 			return z;
+		}
+
+		public IEnumerable<int> SearchNumbers(int sumDigits, int countDigits)
+		{
+			var loggerStartMessage = $"Operation SearchNumbers: {nameof(sumDigits)}={sumDigits}, {nameof(countDigits)}={countDigits}, result=";
+
+			if (sumDigits < 0 || countDigits < 0)
+			{
+				var exceptionMessage = $"Argument {(sumDigits < 0 ? nameof(sumDigits) : nameof(countDigits))} must be zero or positive";
+				_logger.Log($"{loggerStartMessage}'{exceptionMessage}'");
+				throw new ArgumentException(exceptionMessage);
+			}
+
+			var startNumber = (int)Math.Pow(10, countDigits - 1);
+			var endNumber = (int)Math.Pow(10, countDigits) - 1;
+
+			var numbers = new List<int>();
+
+			for (int number = startNumber; number <= endNumber; number++)
+				if (number.ToString().Sum(c => Convert.ToInt32(c.ToString())) == sumDigits)
+					numbers.Add(number);
+
+			var result = numbers.Count > 0 ? new[] { numbers.Count, numbers.Min(), numbers.Max() } : new int[0];
+
+			if (result.Length > 0)
+			{
+				_logger.Log($"{loggerStartMessage}'{string.Join(", ", result)}'");
+				_logger.Log($"All numbers='{string.Join(", ", numbers)}'");
+			}
+			else
+				_logger.Log($"{loggerStartMessage}'NO RESULT'");
+
+			return result;
 		}
 
 	}
